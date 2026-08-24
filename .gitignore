@@ -9,7 +9,7 @@ __pycache__/
 *.egg-info/
 
 # Generated output — regenerate with `python main_tr.py`.
-# Committed copies of these live in reference_outputs/.
+# Committed copies of these live in results/.
 figures_tr/
 
 # OS

@@ -64,6 +64,9 @@ class SiteConfig:
         long format (``turbine_id``/``variable_name``/``value``), e.g.
         the wide-format Türkiye dataset. If ``None``, the long-format
         reader is used.
+    figure_dpi : int
+        Resolution for saved figures. Raise to 300 for print-ready
+        output.
     """
     site_label: str
     turbine_ids: list
@@ -74,6 +77,7 @@ class SiteConfig:
     save_dir: str = './figures'
     dropna_before_clean: bool = True
     real_data_loader: Optional[Callable] = None
+    figure_dpi: int = 150
 
 
 # ---------------------------------------------------------------------------
@@ -798,7 +802,7 @@ def plot_one_replication_per_scenario(
         if cfg.save_dir:
             os.makedirs(cfg.save_dir, exist_ok=True)
             plt.savefig(f"{cfg.save_dir}/{scenario_name}_fits.png",
-                        dpi=150, bbox_inches="tight")
+                        dpi=cfg.figure_dpi, bbox_inches="tight")
             plt.close()
         else:
             plt.show()

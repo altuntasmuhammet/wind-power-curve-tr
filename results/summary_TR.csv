@@ -1,0 +1,2 @@
+Scenario;n_samples;wind_regime;gompertz_shape;Mean_4PL (Kusiak);Mean_4PL (MLE);Mean_5PL (MLE);Mean_MANUFACTURER;SuccessRate_4PL (Kusiak)_%;SuccessRate_4PL (MLE)_%;SuccessRate_5PL (MLE)_%;SuccessRate_MANUFACTURER_%;RankMean_4PL (Kusiak);RankMean_4PL (MLE);RankMean_5PL (MLE);RankMean_MANUFACTURER;RankSuccess_4PL (Kusiak);RankSuccess_4PL (MLE);RankSuccess_5PL (MLE);RankSuccess_MANUFACTURER
+REAL-T1-TR;;;;10.76%;4.69%;2.65%;5.19%;0.0;0.0;100.0;0.0;4;2;1;3;2;2;1;2

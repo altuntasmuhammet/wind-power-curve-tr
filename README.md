@@ -32,8 +32,31 @@ normalised by the 3600 kW rated power:
 The five-parameter logistic model fits the observed data more closely than the
 manufacturer's own published curve.
 
-Reference copies of every figure and results table are in [`reference_outputs/`](reference_outputs/),
-so the expected result can be checked without running anything.
+Committed copies of every figure and results table are in [`results/`](results/), so the
+expected output can be inspected without running anything. Each figure is provided as PNG,
+JPG, and TIFF at 300 DPI; `results/figure_index.csv` lists the figures with their captions.
+
+### Figure 1 — Cleaned data and outliers
+
+Measurements retained by the filter against the points it removed. Curtailment and
+downtime show up as the band of readings at zero power across all wind speeds.
+
+![Figure 1](results/Figure%201.png)
+
+### Figure 2 — Manufacturer power curve
+
+The turbine's published curve, annotated with its operating characteristics: 3.0 m/s
+cut-in, 3600 kW rated power from 13.5 m/s, and 25 m/s cut-off.
+
+![Figure 2](results/Figure%202.png)
+
+### Figure 3 — Fitted models
+
+All four models over the held-out test data, each labelled with its nRMSE. The 5PL curve
+tracks the measurements through the knee of the curve, where the 4PL variants and the
+manufacturer curve deviate most.
+
+![Figure 3](results/Figure%203.png)
 
 ## Requirements
 
@@ -61,18 +84,26 @@ The run takes about one minute on a modern laptop and needs no arguments, no net
 access, and no configuration — the dataset is included in `data/`. All paths resolve
 relative to the source files, so the working directory does not matter.
 
-Output is written to `figures_tr/`:
+Output is written to `figures_tr/`, which mirrors the committed `results/` directory:
 
 | File | Content |
 |---|---|
-| `REAL-T1-TR_fits.png` | All four fitted curves over the test data, labelled with each model's nRMSE |
-| `CleanedFigure_TR.png` | Retained measurements against the points removed by the outlier filter |
-| `Manufacturer_Power_Curve_TR_3600kW.png` | The manufacturer curve, annotated with cut-in speed, rated power, and cut-off speed |
+| `Figure 1.png` / `.jpg` / `.tiff` | Retained measurements against the points removed by the outlier filter |
+| `Figure 2.png` / `.jpg` / `.tiff` | The manufacturer curve, annotated with cut-in speed, rated power, and cut-off speed |
+| `Figure 3.png` / `.jpg` / `.tiff` | All four fitted curves over the test data, labelled with each model's nRMSE |
+| `figure_index.csv` | Figure numbers with their captions |
 | `summary_TR.csv` | Mean nRMSE, success rate, and rank per model |
 | `long_TR.csv` | One row per (scenario, replication, model) |
 
+Figures are numbered sequentially and rendered at 300 DPI, then written in all three
+formats so they can go straight into a manuscript — journals typically ask for TIFF or
+high-quality JPG. To change the numbering or captions, edit `FIGURE_ORDER` in `main_tr.py`.
+
 Figures are deliberately greyscale — line style and hatching carry the distinction rather
 than colour — because they are prepared for black-and-white print.
+
+`figures_tr/` is git-ignored so that re-running does not leave the repository dirty; the
+committed copies in `results/` are what the tables and images above refer to.
 
 ## Data
 
@@ -122,7 +153,7 @@ Every step is seeded, so repeated runs give identical numbers.
 | `filtering.py` | Median-absolute-deviation outlier filter |
 | `manufacture_curve_tr.py` | Manufacturer curve lookup, derivation, and plot |
 | `data/` | Input dataset and derived manufacturer curve |
-| `reference_outputs/` | Committed copies of the figures and tables from a verified run |
+| `results/` | Committed figures and tables from a verified run |
 
 `main_base.py` is the shared engine of a larger multi-site study and is included here
 unmodified, so that the code in this repository is demonstrably the code that produced the
@@ -139,14 +170,17 @@ reported numbers. Two consequences are worth knowing:
 
 ## Licence
 
-**No licence is set yet.** Without one, default copyright applies and others may not reuse
-this code. Add a licence file before making the repository public or citing it as a
-reusable artifact.
+**No licence file is set yet.** This repository is public, but public visibility is not a
+licence: without one, default copyright applies and readers have no right to reuse the
+code. Add a licence — MIT and CC BY are the usual choices for a paper artifact — so that
+citing readers can actually run and build on it.
 
-The dataset in `data/` is redistributed from Kaggle, where its licence is listed as
-*Unknown*. Confirm the terms with the dataset author before publishing this repository or
-redistributing the data further; otherwise, remove `data/turkiye_scada_2018.csv` and have
-users download it from Kaggle themselves.
+**The dataset in `data/` needs a licence check.** `turkiye_scada_2018.csv` is redistributed
+from Kaggle, where the licence is listed as *Unknown*. Redistributing it from a public
+repository may not be permitted. Either confirm the terms with the dataset author, or
+remove `data/turkiye_scada_2018.csv` from the repository and its history and have users
+download `T1.csv` from Kaggle themselves — the loader reads it unchanged apart from the
+file name.
 
 ## Reference
 

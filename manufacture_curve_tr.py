@@ -116,6 +116,7 @@ def plot_power_curve_with_characteristics(
     power_positive_threshold: float = 1.0,
     rated_power_tolerance_ratio: float = 0.01,
     save_dir: str = None,
+    dpi: int = 150,
 ) -> None:
     """
     Plot the manufacturer power curve and annotate its key
@@ -138,6 +139,8 @@ def plot_power_curve_with_characteristics(
     save_dir : str, optional
         Directory in which to save the figure. If ``None``, the plot
         is displayed interactively.
+    dpi : int
+        Resolution of the saved figure.
     """
     turbine_df = POWER_CURVE.copy()
     turbine_df = turbine_df.sort_values("wind_speed").reset_index(drop=True)
@@ -225,7 +228,7 @@ def plot_power_curve_with_characteristics(
         os.makedirs(save_dir, exist_ok=True)
         plt.savefig(
             f"{save_dir}/Manufacturer_Power_Curve_TR_3600kW.png",
-            dpi=150,
+            dpi=dpi,
             bbox_inches="tight",
         )
         plt.close()

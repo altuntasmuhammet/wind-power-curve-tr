@@ -34,6 +34,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from PIL import Image
 
 from filtering import clean
 from main_base import (
@@ -119,6 +120,7 @@ CFG = SiteConfig(
     save_dir=FIGURE_DIR,
     dropna_before_clean=True,
     real_data_loader=load_tr_scada,
+    figure_dpi=300,                       # print-ready
 )
 
 USE_SIMULATION = False
@@ -126,10 +128,80 @@ SIGMA_EPS = 100.0   # kW — Gaussian noise std for simulation mode
 
 
 # ---------------------------------------------------------------------------
+# Figure export
+# ---------------------------------------------------------------------------
+
+# Working file name -> caption, in the order the figures are numbered.
+FIGURE_ORDER = [
+    ('CleanedFigure_TR.png',
+     'Cleaned data and outliers removed by the MAD filter'),
+    ('Manufacturer_Power_Curve_TR_3600kW.png',
+     'Manufacturer power curve with cut-in, rated, and cut-off points'),
+    ('REAL-T1-TR_fits.png',
+     'Fitted power curve models against the held-out test data'),
+]
+
+EXPORT_FORMATS = ('png', 'jpg', 'tiff')
+
+
+def export_figures(save_dir: str, dpi: int = 300) -> pd.DataFrame:
+    """
+    Rename the generated figures to a sequential ``Figure N`` scheme and
+    write each one as PNG, JPG, and TIFF.
+
+    Journals generally ask for sequentially numbered figures in TIFF or
+    high-quality JPG, so each plot is emitted in all three formats at the
+    same resolution it was rendered. The working file is removed once it
+    has been exported.
+
+    Parameters
+    ----------
+    save_dir : str
+        Directory holding the generated figures.
+    dpi : int
+        Resolution recorded in the exported files' metadata. Should match
+        the DPI the figures were rendered at.
+
+    Returns
+    -------
+    pd.DataFrame
+        Index of exported figures with their captions and file names.
+    """
+    save_path = Path(save_dir)
+    rows = []
+
+    for number, (working_name, caption) in enumerate(FIGURE_ORDER, start=1):
+        source = save_path / working_name
+        if not source.exists():
+            print(f"  ! missing, skipped: {working_name}")
+            continue
+
+        stem = f"Figure {number}"
+        with Image.open(source) as img:
+            rgb = img.convert('RGB')
+            rgb.save(save_path / f"{stem}.png", format='PNG', dpi=(dpi, dpi))
+            rgb.save(save_path / f"{stem}.jpg", format='JPEG',
+                     quality=95, dpi=(dpi, dpi))
+            rgb.save(save_path / f"{stem}.tiff", format='TIFF',
+                     compression='tiff_lzw', dpi=(dpi, dpi))
+
+        source.unlink()
+        rows.append({
+            'Figure': stem,
+            'Caption': caption,
+            'Files': ', '.join(f"{stem}.{ext}" for ext in EXPORT_FORMATS),
+        })
+        print(f"  {stem}: {caption}")
+
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
 # Figure: cleaned data and outliers
 # ---------------------------------------------------------------------------
 
-def plot_cleaned_data_and_outliers(save_dir: str = None) -> None:
+def plot_cleaned_data_and_outliers(save_dir: str = None,
+                                   dpi: int = 150) -> None:
     """
     Scatter the cleaned SCADA data against the points the MAD filter
     removed.
@@ -139,6 +211,8 @@ def plot_cleaned_data_and_outliers(save_dir: str = None) -> None:
     save_dir : str, optional
         Directory in which to save the figure. If ``None``, the plot is
         displayed interactively.
+    dpi : int
+        Resolution of the saved figure.
     """
     df = load_tr_scada(CFG.scada_csv)
     if CFG.dropna_before_clean:
@@ -168,7 +242,7 @@ def plot_cleaned_data_and_outliers(save_dir: str = None) -> None:
     if save_dir:
         os.makedirs(save_dir, exist_ok=True)
         plt.savefig(f"{save_dir}/CleanedFigure_TR.png",
-                    dpi=150, bbox_inches="tight")
+                    dpi=dpi, bbox_inches="tight")
         plt.close()
     else:
         plt.show()
@@ -252,8 +326,10 @@ if __name__ == "__main__":
         )
     else:
         df_scenarios = build_real_cases(CFG)
-        plot_cleaned_data_and_outliers(save_dir=CFG.save_dir)
-        plot_power_curve_with_characteristics(save_dir=CFG.save_dir)
+        plot_cleaned_data_and_outliers(save_dir=CFG.save_dir,
+                                       dpi=CFG.figure_dpi)
+        plot_power_curve_with_characteristics(save_dir=CFG.save_dir,
+                                              dpi=CFG.figure_dpi)
 
     plot_one_replication_per_scenario(df_scenarios, CFG)
 
@@ -275,5 +351,10 @@ if __name__ == "__main__":
     df_summary.to_csv(f"{CFG.save_dir}/summary_TR.csv", sep=';', index=False)
     df_long.to_csv(f"{CFG.save_dir}/long_TR.csv", index=False)
 
-    print("Summary results:")
+    if not USE_SIMULATION:
+        print("\nExporting figures (PNG, JPG, TIFF):")
+        df_figures = export_figures(CFG.save_dir, dpi=CFG.figure_dpi)
+        df_figures.to_csv(f"{CFG.save_dir}/figure_index.csv", index=False)
+
+    print("\nSummary results:")
     print(df_summary.to_csv(sep=';', index=False))

@@ -1,0 +1,4 @@
+Figure,Caption,Files
+Figure 1,Cleaned data and outliers removed by the MAD filter,"Figure 1.png, Figure 1.jpg, Figure 1.tiff"
+Figure 2,"Manufacturer power curve with cut-in, rated, and cut-off points","Figure 2.png, Figure 2.jpg, Figure 2.tiff"
+Figure 3,Fitted power curve models against the held-out test data,"Figure 3.png, Figure 3.jpg, Figure 3.tiff"
