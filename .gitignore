@@ -1,0 +1,16 @@
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Generated output — regenerate with `python main_tr.py`.
+# Committed copies of these live in reference_outputs/.
+figures_tr/
+
+# OS
+.DS_Store
